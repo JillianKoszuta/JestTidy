@@ -1,0 +1,16 @@
+/* Override the accordion button style */
+.accordion-button {
+	background-color: #f8f9fa; /* Light gray background */
+	color: #000; /* Black text */
+}
+
+/* Change background color when the accordion is expanded */
+.accordion-button:not(.collapsed) {
+	background-color: #007bff; /* Or any color you'd like for expanded state */
+	color: white; /* White text for the expanded state */
+}
+
+/* Optional: Add some transition for smooth background color change */
+.accordion-button {
+	transition: background-color 0.3s ease;
+}
