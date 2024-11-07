@@ -115,14 +115,16 @@ function createAccordion(groupedData) {
 			});
 
 			accordionHtml += `
-                        			</ul>
-                    			</div>
-                			</div>
-            			</div>
-					</div>
+                        </ul>
+                    </div>
                 </div>
             </div>`;
 		});
+
+		accordionHtml += `
+                    </div>
+                </div>
+            </div>`;
 	});
 
 	accordionHtml += "</div>"; // End the outer accordion
