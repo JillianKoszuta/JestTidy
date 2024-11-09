@@ -10,7 +10,6 @@ const camelCaseToReadableLowerCase = (str) => {
 const createFolderReadableName = (filePath) => {
 	const normalizedPath = normalizePath(filePath);
 	const segments = normalizedPath.split('/');
-	console.log(normalizedPath, segments);
 
 	const parentFolder = segments[segments.length - 2]; // Second to last segment (parent folder)
 
@@ -184,9 +183,54 @@ function filterAccordions() {
 	const searchTerm = document.getElementById('searchFilter').value;
 	const searchStrippedAndLower = searchTerm.replace(/\s+/g, '').toLowerCase();
 
-	const errorFilterValue = document.getElementById('errorCheckbox').value;
+	const errorFilterValue = document.getElementById('errorCheckbox').checked;
 
-	const newData = jestData.map((testFolderObject) => {
+	let listOfData = jestData;
+
+	if (errorFilterValue === true) {
+		console.log('Box was checked');
+		console.log(listOfData);
+
+		// go thru list of grouped files
+		const dataHasBeenFilteredForErrors = listOfData.filter((folder) => {
+			// go thru that groups files
+			const filesFilteredForErrors = folder.testFiles.filter((file) => {
+				// go thru each files assertions
+				const fileAssertionsFilteredForErrors = file.assertionResults.filter(
+					(result) => {
+						// remove all assertions where status is passed
+						if (result.status === 'passed') {
+							return false;
+						} else {
+							return true;
+						}
+					}
+				);
+				file.assertionResults = fileAssertionsFilteredForErrors;
+				// remove all files with no remaining assertions
+				if (fileAssertionsFilteredForErrors.length === 0) {
+					return false;
+				} else {
+					return true;
+				}
+			});
+
+			folder.testFiles = filesFilteredForErrors;
+
+			// remove all groups with no remaining files
+			if (filesFilteredForErrors.length === 0) {
+				return false;
+			} else {
+				return true;
+			}
+		});
+
+		listOfData = dataHasBeenFilteredForErrors;
+	} else {
+		listOfData = jestData;
+	}
+
+	const newData = listOfData.map((testFolderObject) => {
 		const pathStrippedAndLower = testFolderObject.path
 			.replace(/\s+/g, '')
 			.toLowerCase();
@@ -248,4 +292,8 @@ function filterAccordions() {
 // Add event listener to search filter input field
 document
 	.getElementById('searchFilter')
+	.addEventListener('input', filterAccordions);
+
+document
+	.getElementById('errorCheckbox')
 	.addEventListener('input', filterAccordions);
