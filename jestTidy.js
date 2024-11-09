@@ -50,7 +50,7 @@ function createAccordion(groupedData) {
 			? '<span class="badge bg-danger ms-2">*</span>'
 			: '';
 
-		const totalDuration = group.testFiles[0].assertionResults.reduce(
+		const totalDuration = group.testFiles[0]?.assertionResults.reduce(
 			(sum, result) => sum + (result.duration || 0),
 			0
 		);
@@ -185,12 +185,10 @@ function filterAccordions() {
 
 	const errorFilterValue = document.getElementById('errorCheckbox').checked;
 
-	let listOfData = jestData;
+	// copy by value instead of reference
+	let listOfData = structuredClone(jestData);
 
 	if (errorFilterValue === true) {
-		console.log('Box was checked');
-		console.log(listOfData);
-
 		// go thru list of grouped files
 		const dataHasBeenFilteredForErrors = listOfData.filter((folder) => {
 			// go thru that groups files
