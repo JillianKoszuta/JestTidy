@@ -1,16 +1,16 @@
-const normalizePath = (filePath) => filePath.replace(/\\/g, "/"); // Convert backslashes to forward slashes;
+const normalizePath = (filePath) => filePath.replace(/\\/g, '/'); // Convert backslashes to forward slashes;
 
 const camelCaseToReadableLowerCase = (str) => {
 	return str
-		.replace(/([a-z0-9])([A-Z])/g, "$1 $2") // Add space before capital letters
-		.replace(/-/g, " ") // remove '-' replace with a space. "job-order" => "job order"
+		.replace(/([a-z0-9])([A-Z])/g, '$1 $2') // Add space before capital letters
+		.replace(/-/g, ' ') // remove '-' replace with a space. "job-order" => "job order"
 		.replace(/([A-Z])/g, (letter) => letter.toLowerCase()); // Convert all uppercase letters to lowercase
 };
 
 const createFolderReadableName = (filePath) => {
 	const normalizedPath = normalizePath(filePath);
-	const segments = normalizedPath.split("/");
-	console.log(normalizedPath, segments)
+	const segments = normalizedPath.split('/');
+	console.log(normalizedPath, segments);
 
 	const parentFolder = segments[segments.length - 2]; // Second to last segment (parent folder)
 
@@ -23,10 +23,10 @@ const createFolderReadableName = (filePath) => {
 
 const createReadableFileName = (filePath) => {
 	const normalizedPath = normalizePath(filePath);
-	const segments = normalizedPath.split("/");
+	const segments = normalizedPath.split('/');
 
 	// Get the last two segments (parent folder and file name)
-	const fileName = segments[segments.length - 1].split(".")[0]; // File name without extension
+	const fileName = segments[segments.length - 1].split('.')[0]; // File name without extension
 
 	const readableFileName = camelCaseToReadableLowerCase(fileName);
 
@@ -40,16 +40,16 @@ function createAccordion(groupedData) {
 	groupedData.forEach((group, groupIndex) => {
 		// Check if any file in the folder has failed tests
 		const hasFailedTestsInFolder = group.testFiles.some((file) =>
-			file.assertionResults.some((result) => result.status === "failed")
+			file.assertionResults.some((result) => result.status === 'failed')
 		);
 
 		// Folder title with a red dot if any file has failed tests
 		const folderButtonClass = hasFailedTestsInFolder
-			? "accordion-button text-danger"
-			: "accordion-button";
+			? 'accordion-button text-danger'
+			: 'accordion-button';
 		const redDot = hasFailedTestsInFolder
 			? '<span class="badge bg-danger ms-2">*</span>'
-			: "";
+			: '';
 
 		const totalDuration = group.testFiles[0].assertionResults.reduce(
 			(sum, result) => sum + (result.duration || 0),
@@ -73,13 +73,13 @@ function createAccordion(groupedData) {
 		group.testFiles.forEach((file, fileIndex) => {
 			// Check if any test in the file has failed
 			const hasFailedTests = file.assertionResults.some(
-				(result) => result.status === "failed"
+				(result) => result.status === 'failed'
 			);
 
 			// Add the 'text-danger' class if the file has failed tests
 			const fileButtonClass = hasFailedTests
-				? "accordion-button text-danger"
-				: "accordion-button";
+				? 'accordion-button text-danger'
+				: 'accordion-button';
 
 			// Add data-file-title attribute to the file accordion item
 			accordionHtml += `
@@ -96,15 +96,13 @@ function createAccordion(groupedData) {
 			// Add assertion results for the file
 			file.assertionResults.forEach((result) => {
 				const resultClass =
-					result.status === "passed" ? "text-success" : "text-danger"; // Green for passed, red for failed
+					result.status === 'passed' ? 'text-success' : 'text-danger'; // Green for passed, red for failed
 				accordionHtml += `
                     <li class="${resultClass}">
-                        <strong>${result.fullName}</strong> - Duration: ${
-					result.duration 
-				}ms
+                        <strong>${result.fullName}</strong> - Duration: ${result.duration}ms
                 `;
 
-				if (result.status === "failed" && result.failureMessages) {
+				if (result.status === 'failed' && result.failureMessages) {
 					accordionHtml += `
                         <div class="text-danger ms-3">
                             <small> ${result.failureMessages}</small>
@@ -127,25 +125,25 @@ function createAccordion(groupedData) {
             </div>`;
 	});
 
-	accordionHtml += "</div>"; // End the outer accordion
+	accordionHtml += '</div>'; // End the outer accordion
 	return accordionHtml;
 }
 
 const replaceAccordian = (newBodyHtml) => {
-	document.getElementById("accordion-container").innerHTML = newBodyHtml;
+	document.getElementById('accordion-container').innerHTML = newBodyHtml;
 };
 
 let jestData;
 
 // Fetch project data from JSON file
-fetch("jest-results.json")
+fetch('jest-results.json')
 	.then((response) => response.json())
 	.then((data) => {
 		const groupedData = (data?.testResults || []).reduce((acc, file) => {
 			const normalizedPath = normalizePath(file.name);
 			const directoryPath = normalizedPath.substring(
 				0,
-				normalizedPath.lastIndexOf("/")
+				normalizedPath.lastIndexOf('/')
 			); // Get directory path up to the file name
 
 			// Create the human-readable name for the file
@@ -176,19 +174,21 @@ fetch("jest-results.json")
 		jestData = groupedData;
 
 		// replace the html inside the main div with new html created using the grouped data
-		const newHtml = createAccordion(groupedData)
+		const newHtml = createAccordion(groupedData);
 		replaceAccordian(newHtml);
 	});
 
 // Function to filter the accordion items based on the search input
 function filterAccordions() {
 	// get the search term, remove spaces, convert to lower case
-	const searchTerm = document.getElementById("searchFilter").value;
-	const searchStrippedAndLower = searchTerm.replace(/\s+/g, "").toLowerCase();
+	const searchTerm = document.getElementById('searchFilter').value;
+	const searchStrippedAndLower = searchTerm.replace(/\s+/g, '').toLowerCase();
+
+	const errorFilterValue = document.getElementById('errorCheckbox').value;
 
 	const newData = jestData.map((testFolderObject) => {
 		const pathStrippedAndLower = testFolderObject.path
-			.replace(/\s+/g, "")
+			.replace(/\s+/g, '')
 			.toLowerCase();
 
 		// if folder name matches, return entire object
@@ -200,7 +200,7 @@ function filterAccordions() {
 		// A: file name matches searched term
 		const fileNameMatches = testFolderObject.testFiles.filter((testFile) =>
 			testFile.name
-				.replace(/\s+/g, "")
+				.replace(/\s+/g, '')
 				.toLowerCase()
 				.includes(searchStrippedAndLower)
 		);
@@ -217,7 +217,7 @@ function filterAccordions() {
 				const assertionMatches = testFile.assertionResults.filter(
 					(assertion) => {
 						return assertion.fullName
-							.replace(/\s+/g, "")
+							.replace(/\s+/g, '')
 							.toLowerCase()
 							.includes(searchStrippedAndLower);
 					}
@@ -241,11 +241,11 @@ function filterAccordions() {
 		}
 	});
 
-	const newHtml = createAccordion(newData.filter((item) => !!item))
+	const newHtml = createAccordion(newData.filter((item) => !!item));
 	replaceAccordian(newHtml);
 }
 
 // Add event listener to search filter input field
 document
-	.getElementById("searchFilter")
-	.addEventListener("input", filterAccordions);
+	.getElementById('searchFilter')
+	.addEventListener('input', filterAccordions);
