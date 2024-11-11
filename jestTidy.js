@@ -7,14 +7,22 @@ const camelCaseToReadableLowerCase = (str) => {
 		.replace(/([A-Z])/g, (letter) => letter.toLowerCase()); // Convert all uppercase letters to lowercase
 };
 
+const filePathLengths = [];
+let shortestPath = null;
+
 const createFolderReadableName = (filePath) => {
 	const normalizedPath = normalizePath(filePath);
 	const segments = normalizedPath.split('/');
 
-	const parentFolder = segments[segments.length - 2]; // Second to last segment (parent folder)
+	if (segments.length < shortestPath || shortestPath == null) {
+		shortestPath = segments.length;
+	}
+
+	const shortPath = segments.slice(shortestPath - 2, segments.length - 1);
+	console.log(shortPath.join(' / '));
 
 	// Return the formatted readable name
-	return camelCaseToReadableLowerCase(parentFolder).replace(
+	return camelCaseToReadableLowerCase(shortPath.join(' / ')).replace(
 		/^([a-z])/,
 		(match) => match.toUpperCase()
 	);
@@ -147,6 +155,7 @@ fetch('jest-results.json')
 
 			// Create the human-readable name for the file
 			const readableName = createReadableFileName(file.name);
+
 			file.readableName = readableName;
 
 			// Check if a group with the same directory path already exists
@@ -225,7 +234,7 @@ function filterAccordions() {
 
 		listOfData = dataHasBeenFilteredForErrors;
 	} else {
-		listOfData = jestData;
+		listOfData = structuredClone(jestData);
 	}
 
 	const newData = listOfData.map((testFolderObject) => {
