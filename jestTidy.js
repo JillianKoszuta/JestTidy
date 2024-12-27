@@ -19,7 +19,6 @@ const createFolderReadableName = (filePath) => {
 	}
 
 	const shortPath = segments.slice(shortestPath - 2, segments.length - 1);
-	console.log(shortPath.join(' / '));
 
 	// Return the formatted readable name
 	return camelCaseToReadableLowerCase(shortPath.join(' / ')).replace(
@@ -142,49 +141,34 @@ const replaceAccordian = (newBodyHtml) => {
 
 let jestData;
 
+const convertResponseToObject = async (response) => {
+	return await response.json();
+};
+
+const processFile = async (response) => {
+	// function body
+	console.log(response);
+	const convertedData = await convertResponseToObject(response);
+	console.log(convertedData);
+	return convertedData;
+};
+
+const results = fetch('jest-results.json');
+
+console.log(results);
 // Fetch project data from JSON file
-fetch('jest-results.json')
-	.then((response) => response.json())
-	.then((data) => {
-		const groupedData = (data?.testResults || []).reduce((acc, file) => {
-			const normalizedPath = normalizePath(file.name);
-			const directoryPath = normalizedPath.substring(
-				0,
-				normalizedPath.lastIndexOf('/')
-			); // Get directory path up to the file name
 
-			// Create the human-readable name for the file
-			const readableName = createReadableFileName(file.name);
+results.then(processFile);
 
-			file.readableName = readableName;
+const fileNames = [
+	'jest-results.json',
+	'jest-results2.json',
+	'jest-results3.json',
+];
 
-			// Check if a group with the same directory path already exists
-			let group = acc.find((item) => item.path === directoryPath);
-
-			if (group) {
-				// If found, push the file to the existing group's files array
-				group.testFiles.push(file);
-			} else {
-				// Otherwise, create a new group
-				acc.push({
-					path: directoryPath,
-					testFiles: [file],
-					readableFolderName: createFolderReadableName(file.name).replace(
-						/^([a-z])/,
-						(match) => match.toUpperCase()
-					),
-				});
-			}
-
-			return acc;
-		}, []);
-
-		jestData = groupedData;
-
-		// replace the html inside the main div with new html created using the grouped data
-		const newHtml = createAccordion(groupedData);
-		replaceAccordian(newHtml);
-	});
+fileNames.forEach((fileName) => {
+	console.log(fileName);
+});
 
 // Function to filter the accordion items based on the search input
 function filterAccordions() {
@@ -276,7 +260,6 @@ function filterAccordions() {
 
 				if (assertionMatches.length > 0) {
 					testFile.assertionResults = assertionMatches;
-					console.log(testFile);
 					return testFile;
 				} else {
 					return null;
